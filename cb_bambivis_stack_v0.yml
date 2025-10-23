@@ -1,0 +1,93 @@
+services:
+  # Serviço PostgreSQL para o Canoa Bahia CRM/ERP
+  canoabahia_db:
+    image: postgres:15-alpine
+    container_name: canoabahia_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: canoabahia_crm
+      POSTGRES_USER: canoabahia_user
+      POSTGRES_PASSWORD: amelofil90 # MUDE ISTO!
+    volumes:
+      - canoabahia_db_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d # Para scripts de inicialização
+    networks:
+      - canoabahia_network # Rede interna para os serviços da aplicação
+
+  # Serviço Directus (Backend/API e CMS)
+  canoabahia_directus:
+    image: directus/directus:10.10.3 # Versão estável, sempre bom especificar
+    container_name: canoabahia_directus
+    restart: unless-stopped
+    ports:
+      - "8055:8055" # Porta interna do Directus exposta
+    environment:
+      KEY: sua_chave_secreta_aqui # MUDE ISTO! Chave de segurança para o Directus
+      SECRET: seu_segredo_super_secreto_aqui # MUDE ISTO! Segredo para JWT
+      DB_CLIENT: pg
+      DB_HOST: canoabahia_db # Nome do serviço do banco de dados no docker-compose
+      DB_PORT: 5432
+      DB_DATABASE: canoabahia_crm
+      DB_USER: canoabahia_user
+      DB_PASSWORD: amelofil90 # MUDE ISTO! Deve ser a mesma do canoabahia_db
+      ADMIN_EMAIL: contato@bambivis.com # Email para o primeiro usuário admin
+      ADMIN_PASSWORD: senha_admin_directus # MUDE ISTO! Senha para o primeiro usuário admin
+      PUBLIC_URL: https://cadastro.bambivis.com # URL pública que o Directus usará
+      # Caching
+      CACHE_ENABLED: 'true'
+      CACHE_STORE: memory # Redis é melhor para produção, mas memory é simples para iniciar
+      # CORS
+      CORS_ENABLED: 'true'
+      CORS_ORIGIN: https://cadastro.bambivis.com, https://seu-frontend-url.com # Adicione URLs do seu frontend aqui
+    depends_on:
+      - canoabahia_db
+    networks:
+      - canoabahia_network
+      - proxy_network # Adicione a rede do NGINX Proxy Manager
+
+  # NGINX Proxy Manager (se já não estiver no seu docker-compose)
+  nginx_bambivis:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx_bambivis
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    environment:
+      DB_MYSQL_HOST: 'seu_banco_mysql_para_npm' # Se usar MySQL para o NPM
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: 'seu_usuario_npm'
+      DB_MYSQL_PASSWORD: 'sua_senha_npm'
+      DB_MYSQL_DATABASE: 'seu_banco_npm'
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy_network
+
+  # Bootpress (assumindo que já está configurado para usar um banco de dados)
+  # bootpress:
+  #   image: seu_bootpress_image
+  #   container_name: bootpress
+  #   restart: unless-stopped
+  #   environment:
+  #     DB_CLIENT: pg
+  #     DB_HOST: canoabahia_db # Bootpress também pode usar o canoabahia_db
+  #     DB_DATABASE: canoabahia_crm
+  #     DB_USER: canoabahia_user
+  #     DB_PASSWORD: sua_senha_segura_aqui
+  #   depends_on:
+  #     - canoabahia_db
+  #   networks:
+  #     - canoabahia_network
+
+volumes:
+  canoabahia_db_data:
+
+networks:
+  canoabahia_network: # Rede interna para serviços da aplicação
+    driver: bridge
+  proxy_network: # Rede externa para o NGINX Proxy Manager
+    external: true
+    name: proxy # O nome da sua rede externa para o Nginx Proxy Manager
