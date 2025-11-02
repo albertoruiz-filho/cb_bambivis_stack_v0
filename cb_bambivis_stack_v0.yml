@@ -24,8 +24,7 @@ services:
     # ports:
     #   - "8055:8055"
     environment:
-      KEY: ss09iouzOOKcNAiPqjFGdinJXprCuV1Wj8r0x8ftcIU # MUDE ISTO! Explicação abaixo.
-      SECRET: d5df39ebf5520cc029cd238c96d2976b56b3c9c982081a2612ac09818685758e # MUDE ISTO! Explicação abaixo.
+      KEY: e # MUDE ISTO! Explicação abaixo.
       DB_CLIENT: pg
       DB_HOST: canoabahia_db # Nome do serviço do banco de dados no docker-compose
       DB_PORT: 5432

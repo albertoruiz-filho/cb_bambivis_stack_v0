@@ -1,0 +1,23 @@
+# Arquivos sensíveis
+.env
+
+# Docker volumes e logs
+*.log
+docker-compose.override.yml
+init-db/
+
+# Node.js (se usar)
+node_modules/
+
+# Python (se usar)
+__pycache__/
+*.pyc
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
