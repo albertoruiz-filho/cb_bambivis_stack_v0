@@ -5,9 +5,9 @@ services:
     container_name: canoabahia_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: canoabahia_crm
-      POSTGRES_USER: canoabahia_user
-      POSTGRES_PASSWORD: oldpass123 # MUDE ISTO PARA UMA SENHA FORTE!
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # MUDE ISTO PARA UMA SENHA FORTE!
     volumes:
       - canoabahia_db_data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d # Para scripts de inicialização
@@ -24,23 +24,23 @@ services:
     # ports:
     #   - "8055:8055"
     environment:
-      KEY: ss09iouzOOKcNAiPqjFGdinJXprCuV1Wj8r0x8ftcIU # MUDE ISTO! Explicação abaixo.
-      SECRET: d5df39ebf5520cc029cd238c96d2976b56b3c9c982081a2612ac09818685758e # MUDE ISTO! Explicação abaixo.
-      DB_CLIENT: pg
-      DB_HOST: canoabahia_db # Nome do serviço do banco de dados no docker-compose
-      DB_PORT: 5432
-      DB_DATABASE: canoabahia_crm
-      DB_USER: canoabahia_user
-      DB_PASSWORD: oldpass123 # MUDE ISTO! Deve ser a mesma do canoabahia_db
-      ADMIN_EMAIL: admin@canoabahia.com.br # Email para o primeiro usuário admin
-      ADMIN_PASSWORD: senha_admin_directus # MUDE ISTO! Senha para o primeiro usuário admin
-      PUBLIC_URL: https://cadastro.bambivis.com # URL pública que o Directus usará
+      KEY: ${KEY} # MUDE ISTO! Explicação abaixo.
+      SECRET: ${SECRET} # MUDE ISTO! Explicação abaixo.
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST} # Nome do serviço do banco de dados no docker-compose
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD} # MUDE ISTO! Deve ser a mesma do canoabahia_db
+      ADMIN_EMAIL: ${ADMIN_EMAIL} # Email para o primeiro usuário admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD} # MUDE ISTO! Senha para o primeiro usuário admin
+      PUBLIC_URL: ${PUBLIC_URL} # URL pública que o Directus usará
       # Caching
-      CACHE_ENABLED: 'true'
-      CACHE_STORE: memory # Redis é melhor para produção, mas memory é simples para iniciar
+      CACHE_ENABLED: ${CACHE_ENABLED}
+      CACHE_STORE: ${CACHE_STORE} # Redis é melhor para produção, mas memory é simples para iniciar
       # CORS
-      CORS_ENABLED: 'true'
-      CORS_ORIGIN: https://cadastro.bambivis.com,https://app.bambivis.com,http://localhost:3000 # Adicione URLs do seu frontend aqui, incluindo localhost para dev.
+      CORS_ENABLED: ${CORS_ENABLED}
+      CORS_ORIGIN: ${CORS_ORIGIN} # Adicione URLs do seu frontend aqui, incluindo localhost para dev.
     depends_on:
       - canoabahia_db
     networks:
@@ -59,7 +59,7 @@ services:
   #     DB_HOST: canoabahia_db # Bootpress também pode usar o canoabahia_db
   #     DB_DATABASE: canoabahia_crm
   #     DB_USER: canoabahia_user
-  #     DB_PASSWORD: oldpass123 # Use a mesma senha do banco ou crie um usuário específico
+  #     DB_PASSWORD: am90 # Use a mesma senha do banco ou crie um usuário específico
   #     # Outras variáveis de ambiente do Bootpress
   #   depends_on:
   #     - canoabahia_db
@@ -76,4 +76,3 @@ networks:
   proxy: # Rede externa para o NGINX Proxy Manager (já existe)
     external: true
     # name: proxy # Não é necessário especificar 'name' se a rede já foi criada externamente com esse nome
-
